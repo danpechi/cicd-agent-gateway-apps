@@ -4,17 +4,13 @@ MLflow ChatModel — calls FMAPI (databricks-meta-llama-3-3-70b-instruct)
 to generate personalised sales outreach emails.
 """
 
-import os
-import requests
 import mlflow
+from mlflow.deployments import get_deploy_client
 from mlflow.pyfunc import ChatModel
 from mlflow.types.llm import (
     ChatCompletionResponse,
-    ChatCompletionChunk,
     ChatMessage,
     ChatChoice,
-    ChatChoiceDelta,
-    ChatChunkChoice,
 )
 
 # ---------------------------------------------------------------------------
@@ -90,36 +86,23 @@ class ZscalerEmailAgent(ChatModel):
             (m.content for m in reversed(messages) if m.role == "user"), ""
         )
 
-        host  = os.environ.get("DATABRICKS_HOST",  "").rstrip("/")
-        token = os.environ.get("DATABRICKS_TOKEN", "")
+        # mlflow.deployments handles auth automatically in Model Serving runtime —
+        # no explicit host/token needed.
+        client = get_deploy_client("databricks")
 
-        if not host or not token:
-            raise RuntimeError(
-                "DATABRICKS_HOST and DATABRICKS_TOKEN must be set "
-                "in the serving endpoint environment."
-            )
-
-        payload = {
-            "messages": [
-                {"role": "system", "content": _SYSTEM_PROMPT},
-                {"role": "user",   "content": user_msg},
-            ],
-            "max_tokens": 600,
-            "temperature": 0.75,
-        }
-
-        r = requests.post(
-            f"{host}/serving-endpoints/databricks-meta-llama-3-3-70b-instruct/invocations",
-            json=payload,
-            headers={
-                "Authorization": f"Bearer {token}",
-                "Content-Type":  "application/json",
+        response = client.predict(
+            endpoint="databricks-meta-llama-3-3-70b-instruct",
+            inputs={
+                "messages": [
+                    {"role": "system", "content": _SYSTEM_PROMPT},
+                    {"role": "user",   "content": user_msg},
+                ],
+                "max_tokens": 600,
+                "temperature": 0.75,
             },
-            timeout=60,
         )
-        r.raise_for_status()
 
-        response_text = r.json()["choices"][0]["message"]["content"]
+        response_text = response["choices"][0]["message"]["content"]
 
         return ChatCompletionResponse(
             choices=[
