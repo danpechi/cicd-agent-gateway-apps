@@ -1,0 +1,30 @@
+resources:
+  jobs:
+    zscaler_setup:
+      name: "[${bundle.target}] Zscaler Email Agent Setup"
+      tasks:
+        - task_key: log_agent
+          spark_python_task:
+            python_file: "${workspace.file_path}/src/log_agent.py"
+            parameters:
+              - "${var.catalog}"
+              - "${var.schema}"
+          environment_key: agent_env
+
+        - task_key: deploy_agent
+          depends_on:
+            - task_key: log_agent
+          spark_python_task:
+            python_file: "${workspace.file_path}/src/deploy_agent.py"
+            parameters:
+              - "${var.catalog}"
+              - "${var.schema}"
+          environment_key: agent_env
+
+      environments:
+        - environment_key: agent_env
+          spec:
+            client: "4"
+            dependencies:
+              - "mlflow>=2.14.0"
+              - "databricks-sdk>=0.20.0"
