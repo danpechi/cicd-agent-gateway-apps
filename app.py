@@ -198,10 +198,7 @@ def call_agent(endpoint_name: str, prompt: str) -> str:
 # ---------------------------------------------------------------------------
 
 with st.sidebar:
-    st.image(
-        "https://www.zscaler.com/themes/custom/zscaler/logo.svg",
-        width=160,
-    ) if False else st.markdown("## 🔐 Zscaler Email Generator")
+    st.markdown("## 🔐 Zscaler Email Generator")
 
     st.markdown("---")
     st.subheader("Configuration")

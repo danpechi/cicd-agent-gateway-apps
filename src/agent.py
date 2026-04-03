@@ -1,6 +1,6 @@
 """
 Zscaler Email Generation Agent
-MLflow ChatModel — calls FMAPI (databricks-meta-llama-3-3-70b-instruct)
+MLflow ChatModel — calls FMAPI (databricks-claude-sonnet-4-5)
 to generate personalised sales outreach emails.
 """
 
@@ -91,7 +91,7 @@ class ZscalerEmailAgent(ChatModel):
         client = get_deploy_client("databricks")
 
         response = client.predict(
-            endpoint="databricks-meta-llama-3-3-70b-instruct",
+            endpoint="databricks-claude-sonnet-4-5",
             inputs={
                 "messages": [
                     {"role": "system", "content": _SYSTEM_PROMPT},
