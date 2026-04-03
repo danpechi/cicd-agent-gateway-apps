@@ -34,7 +34,7 @@ ENDPOINT_NAME = f"zscaler-email-{_short}"
 # Resolve latest model version
 # ---------------------------------------------------------------------------
 
-versions = _w.registered_models.list_versions(MODEL_NAME)
+versions = list(_w.model_versions.list(full_name=MODEL_NAME))
 latest   = max(versions, key=lambda v: int(v.version))
 MODEL_VERSION = str(latest.version)
 print(f"Deploying {MODEL_NAME} version {MODEL_VERSION} → {ENDPOINT_NAME}")
