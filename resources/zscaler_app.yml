@@ -1,6 +1,6 @@
 resources:
   apps:
     zscaler_app:
-      name: "zscaler-email-${var.schema}"
-      description: "Zscaler Email Generator — AI-powered sales outreach with AI Gateway"
+      name: "zscaler-email-agent"
+      description: "Zscaler Email Generator — AI-powered sales outreach"
       source_code_path: ..
